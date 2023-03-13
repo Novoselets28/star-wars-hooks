@@ -1,6 +1,7 @@
 import React from 'react';
 
 function CurrentPeople({ person }) {
+  
   return (
     <div className='selected-item'>
       <h3>{person.name}</h3>
