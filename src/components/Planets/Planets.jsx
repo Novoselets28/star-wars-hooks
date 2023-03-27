@@ -1,27 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router';
+import CurrentPlanet from './CurrentPlanet';
+import PlanetsList from './PlanetsList';
 
-function Planets({ planets, onItemClick }) {
+export default function Planets() {
 
-    const [showComponent, setShowComponent] = useState(false);
+  const [planets, setPlanets] = useState([]);
+  const [selectedPlanet, setSelectedPlanet] = useState(null);
 
-    const toggleShowComponent = () => {
-      setShowComponent(!showComponent);
-    };
+  const navigate = useNavigate()
+  const goBack = () => navigate(-1)
+
+  
+
+  useEffect(() => {
+      fetch('https://swapi.dev/api/planets/')
+      .then(response => response.json())
+      .then(data => setPlanets(data.results));
+  }, []);
+
+    const handlePlanetClick = (planet) => {
+        setSelectedPlanet(planet);
+      }
 
   return (
-    <div className='item-list'>
-      <h2 onClick={toggleShowComponent}>Planets</h2>
-      {showComponent && (
-        <ul>
-            {planets.map(planets => (
-            <li key={planets.url} onClick={() => onItemClick(planets)}>
-                {planets.name}
-            </li>
-            ))}
-        </ul>)
-      }
-    </div>
-  );
+    <div className='item-block'>
+      <PlanetsList planets={planets} onItemClick={handlePlanetClick} />
+        {selectedPlanet && <CurrentPlanet planets={selectedPlanet} />}
+      <button onClick={goBack}>Go back</button>
+            </div>
+  )
 }
-
-export default Planets;

@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router';
+import CurrentStarship from './CurrentStarship';
+import StarshipsList from './StarshipsList';
 
-function Starships({ starships, onItemClick }) {
+export default function Starships() {
 
-    const [showComponent, setShowComponent] = useState(false);
+  const [starships, setStarships] = useState([]);
+  const [selectedStarships, setSelectedStarships] = useState(null);
 
-  const toggleShowComponent = () => {
-      setShowComponent(!showComponent);
-    };
+  const navigate = useNavigate()
+  const goBack = () => navigate(-1)
 
-  return (
-    <div className='item-list'>
-      <h2 onClick={toggleShowComponent}>Starships</h2>
-      {showComponent && (
-        <ul>
-            {starships.map(starships => (
-            <li key={starships.url} onClick={() => onItemClick(starships)}>
-                {starships.name}
-            </li>
-            ))}
-        </ul>)
+    useEffect(() => {
+        fetch('https://swapi.dev/api/starships/')
+        .then(response => response.json())
+        .then(data => setStarships(data.results));
+    }, []);
+
+    const handleStarshipClick = (starship) => {
+        setSelectedStarships(starship);
       }
+      
+  return (
+    <div className='item-block'>
+      <StarshipsList starships={starships} onItemClick={handleStarshipClick} />
+        {selectedStarships && <CurrentStarship starships={selectedStarships} />}
+      <button onClick={goBack}>Go back</button>
     </div>
-  );
+  )
 }
-
-export default Starships;

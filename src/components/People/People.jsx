@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router';
+import CurrentPeople from './CurrentPeople';
+import PeopleList from './PeopleList';
 
-function People({ people, onItemClick }) {
+export default function People() {
 
-  const [showComponent, setShowComponent] = useState(false);
+    const [people, setPeople] = useState([]);
+    const [selectedPerson, setSelectedPerson] = useState(null);
 
-  const toggleShowComponent = () => {
-      setShowComponent(!showComponent);
-    };
+    const navigate = useNavigate()
+    const goBack = () => navigate(-1)
 
-  
-  return (
-    <div className='item-list'>
-      <h2 onClick={toggleShowComponent}>People</h2>
-      {showComponent && (
-        <ul>
-          {people.map(person => (
-            <li key={person.url} onClick={() => onItemClick(person)}>
-              {person.name}
-            </li>
-          ))}
-        </ul>)
+    useEffect(() => {
+        fetch('https://swapi.dev/api/people/')
+        .then(response => response.json())
+        .then(data => setPeople(data.results));
+    }, []);
+
+    const handlePersonClick = (person) => {
+        setSelectedPerson(person);
       }
+  return (
+    <div className='item-block'>
+      <PeopleList people={people} onItemClick={handlePersonClick} />
+        {selectedPerson && <CurrentPeople person={selectedPerson} />}
+      <button onClick={goBack}>Go back</button>
     </div>
-  );
+  )
 }
-
-export default People;
